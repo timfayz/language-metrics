@@ -1,0 +1,1191 @@
+% Document Settings
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[11pt]{article}
+% \usepackage{mathtools}
+\usepackage{mathabx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{calc}
+\usepackage{enumitem}
+\usepackage{csquotes}
+\usepackage[hidelinks]{hyperref}
+\pagenumbering{gobble}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage[
+  a4paper,
+  top    =1cm,
+  bottom =2cm,
+  left   =2cm,
+  right  =2cm,
+  footskip=40pt
+  ]{geometry}
+\usepackage[
+  sorting=none,
+  % hyperref=true,
+  % sortcites=true
+  ]{biblatex}
+\addbibresource{appendixrefs.bib}
+\AtEveryBibitem{
+    % \clearfield{urlyear}
+    % \clearfield{urlmonth}
+    % \clearfield{urlday}
+    \clearfield{note}
+    \clearfield{language}
+}
+
+
+\begin{document}
+
+% Document Starts
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newgeometry{top=2cm, textwidth=17cm}
+\twocolumn
+
+\section*{Appendix A}
+\label{sec:metrics-table}
+\vspace{-0.8em}
+\section*{\normalsize\textsc{Programming language metrics}}
+\vspace{-0.5em}
+\textcolor{gray}{
+    \small Timur Fayzrakhmanov, Innopolis University\\
+    \texttt{v0.4} (updated 22 Dec, 2022)
+}
+
+\bigskip
+
+\noindent 
+This document is a collection of over 70 unique \textit{programming language metrics}. The purpose of this document is to provide \textit{dimensions} (features, properties, aspects) by which any two computer languages can be qualitatively and quantitatively compared. These metrics can be used to analyse languages, define requirements, create rankings, provide tips for language designers, or simply give a bird's-eye view on existing language features. The list is based on metrics commonly used in programming language research, development and use, as well as the years of author/contributors personal experience.
+This appendix is a part of an article ``Introducing Programming Language Metrics'' written by Timur Fayzrakhmanov for \textit{Proceedings of the Institute for System Programming of the Russian Academy of Sciences} (Proceedings of ISP RAS).
+
+
+% Disclaimer
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \subsection*{\normalfont\small\textsc{Disclaimer}}
+% The list does not pretend to be \textit{complete} or theoretically precise. As the field progresses, there will be always new unique ways to measure language aspects, similar to those of software metrics. This document is simply an attempt to make a first approximation of what programming language metrics might be, what one can measure in general, and how they can be used in practice.
+
+% Contribution
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{Contribution}
+This document is open-source. To contribute new metrics, typo fixes, or suggest any other improvements, please send an email to \texttt{\small tim.\-fayzrakhmanov\-@gmail.com} or make a pull request/open issue at \texttt{\small https://\-github.com/\-timfayz/\-language-\-metrics}.\\
+Please, specify your full name, public email, and affiliation if necessary. Full list of contributors can be found at the end of this document (Section \textsc{Acknowledgement}). 
+
+% Legend
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{Legend}
+
+Metrics are grouped into nine basic categories:
+
+\vspace{-5pt}
+\begin{enumerate}
+    \setlength\itemsep{-3pt}
+    \item \textit{User experience} -- a user background affecting the language use
+    \item \textit{Language recognizability} -- how popular the language is
+    \item \textit{Language infrastructure} -- surrounding documentation and libraries
+    \item \textit{Language development and support} -- maintenance, user support, and tooling
+    \item \textit{Language special features} -- coding experience and special-purpose features
+    \item \textit{Language implementation and programs} -- compiler and its generated executable files
+    \item \textit{Language specialization and design} -- focus and syntactic/semantic design decisions
+    \item \textit{Language definition} -- specification, formalization, and standardization
+    \item \textit{Language origin} -- by whom, when, and why the language was originally conceived
+\end{enumerate}
+\vspace{-5pt}
+
+Each metric has an ordinal number, name, indicators for measuring score, and examples of a user feedback. The order of categories and metrics within is by potential `impact factor' for an \textit{ordinary end-user} rather than by the impact factor for a potential language designer. 
+
+\smallskip
+
+\noindent\texttt{First column} contains:
+
+\vspace{-5pt}
+\begin{enumerate}
+    \setlength\itemsep{-3pt}
+    \item \textbf{Metric name} with a polarity sign: $\uparrow$ `higher or support is better', $\downarrow$ `lower or absence is better', and $\circ$ `neutral or depends'
+    \item \textit{Feature names} found in the advertising descriptions of languages (should be read as ``\textit{Language is / has / supports ...}'')
+    \item \textcolor{gray!90}{Typical examples} of languages with a good demonstration score (based on public information, author/contributors experience, with no supporting references)
+\end{enumerate}
+\vspace{-5pt}
+
+\noindent\texttt{Second column} contains a set of indicators for measuring metric `score'. If many, indicators can be added together or used individually to adjust the desired accuracy.
+
+\smallskip
+
+\noindent\texttt{Third column} describes typical positive `\texttt{+}' or negative `\texttt{-}' end-user perception (usually emotional ones) that have been found ``in the wild'' (forums, comments, contributors/author experience). Sometimes we put content of the third column in the second (after a long dash `---') to save some vertical space.
+
+\restoregeometry
+
+% Metric Table settings
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Metric counter
+\newcounter{ccnt}
+\newcommand{\cnt}{\stepcounter{ccnt}\the\value{ccnt}.}
+% Gray text
+\newcommand{\gray}[1]{\textcolor{gray!70}{\scriptsize#1}}
+% Special symbols
+\newcommand{\high}{$\uparrow$}
+\newcommand{\low}{$\downarrow$}
+\newcommand{\llow}{$^\downarrow$}
+\newcommand{\hhigh}{$^\uparrow$}
+\newcommand{\mmid}{$^\circ$}
+\newcommand{\indicator}{\mbox{$\blacktriangleright$}~}  
+\newcommand{\commentp}{\texttt{+}~}
+\newcommand{\commentn}{\texttt{-}~}
+
+% Metric category
+\newcommand{\metriccategory}[1]{
+    \multicolumn{3}{p{\textwidth+30pt}}{\cellcolor{gray!12}\linebreak\centering\textbf{#1}\tiny\linebreak}
+}
+% Ruler to see available horizontal space
+\newcommand{\ruler}{\noindent {\color{red} \rule{\linewidth}{0.5mm}}}
+% Table formatting
+\setlength{\tabcolsep}{4pt}
+\setlength{\arrayrulewidth}{.15ex} % table line thickness
+% \renewcommand{\arraystretch}{1} % vertical cell
+\setlength\LTleft{-20pt} % expand left and 
+\setlength\LTright{-20pt} % right relative to \textwidth
+\footnotesize
+
+% Metric Table
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{longtable}{
+        % Columns settings
+        % %%%%%%%%%%%%%%%%%%%%%%%%
+        @{\hspace{-20pt}}>{\raggedleft\scriptsize\color{gray!30}\ttfamily}
+        p{20pt}<{~~~}         % counter col
+        @{}                   % remove left margin to span entire space
+        >{\raggedright}p{.2\textwidth}       % metric col
+        >{\raggedright}p{.4\textwidth+12pt}  % indicators col
+        p{.4\textwidth+12pt}  % perception col
+        @{}                   % remove right margin
+    }
+
+    % Columns headers
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    & \textbf{Metric name}\textsuperscript{(polarity)}\newline 
+    \textit{Feature name}\newline 
+    \gray{Typical representative}
+    & \textbf{How to measure}\newline
+    Common \indicator indicators for measuring metric score
+    & \textbf{Typical end-user perception}\newline
+    Positive \commentp or negative \commentn comments found in the wild,\newline when the score is high/low in the metric's polarity
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{User Experience}
+    \\ 
+    \noalign{\vspace{5pt}}
+
+
+    
+    \cnt& \textbf{Familiarity\hhigh}
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    & \indicator \textit{N} of years coding in the language
+    & \commentp ``It is easier to code in because I already know the language''
+    \\
+
+    
+    \cnt& \textbf{Similarity\hhigh}\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \gray{C, C++, C\texttt{\#}}\newline
+    \gray{Pascal, Modula, Oberon}
+    & \indicator Language is similar to other languages known by the user
+    & \commentp ``The language is really easy to grasp because it looks similar to others''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{Language Recognizability}
+    \\ 
+    \noalign{\vspace{5pt}}
+
+
+    
+    \cnt& \textbf{Popularity}\hhigh\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Popular}\newline 
+    \textit{Mainstream}\newline
+    \textit{Rich set of libraries}\newline
+    \textit{Rich community support}\newline
+    \gray{Python, JavaScript}
+    & 
+    \indicator Rank of the language in popularity ranks/surveys: \newline TIOBE\cite{idx_tiobe}, PYPL\cite{idx_pypl}, IEEE Sepectrum\cite{idx_ieee_spectrum}, StackOverflow Survey\cite{idx_stack_survey}, GitHub's State of Octoverse\cite{idx_gihub_octoverse}\newline 
+    If manually (the order reflects an ease of checking): \newline 
+    \indicator Wiki page is available \newline 
+    \indicator Is in `Popular' category at GitHub's search\cite{github_search}\newline
+    \indicator Reddit community is available + \textit{N} of members \newline
+    \indicator \textit{N} of questions at StackOverflow\cite{stackoverflow_search}\newline
+    \indicator \textit{N} of packages at GitHub\cite{github_search}\newline
+    \indicator \textit{N} of references/tutorials in web searches \newline
+    \indicator \textit{N} of books written \newline
+    \indicator YouTube videos are available \newline
+    \indicator Job openings are available
+    & 
+    \commentp ``Language must be safe to learn because a lot of people already use it and there must be a reason for it'' \newline
+    \commentp ``Language must be actively developed\textsuperscript{*} and its development won't be abandoned soon'' \newline
+    \commentp ``There are plenty of tutorials, examples, snippets, answers to get started'' \newline
+    \commentp ``It's probably easier to find a job'' \smallskip\newline
+    \gray{\textsuperscript{*} language development might be stagnating even if it is still actively used or considered popular. That is why we included `Development' as a separate metric}
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Trendiness}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Trendy}\newline
+    \textit{`Rising star'}\newline
+    \gray{Haskell, Python, Rust}
+    %
+    & \indicator \textit{N} of stars in public repository compared to the date of the project inception \newline
+    \indicator Language has a surge of interest in newsgroups, conference talks and media channels
+    %
+    & \commentp ``The language seems promising. If I start using it now, it may payoff in the future (new jobs, niches, technological advantage)''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{Language Infrastructure}
+    \\
+    \noalign{\vspace{5pt}}
+ 
+
+    \cnt& \textbf{Documentation}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Easy to read}\newline
+    \textit{Comprehensive}\newline
+    \textit{Full of examples}\newline
+    \gray{PHP, C\texttt{\#}, Go}
+    %
+    & \indicator Language has `official documentation', `reference manual', or `programmer's guide' that: \newline
+    \indicator Clearly describes how to get started\newline
+    \indicator Written in a clear/informal manner \newline
+    \indicator Has a wide coverage \newline
+    \indicator Contains illustrative code samples (examples) \newline
+    \indicator Well linked with other parts of documentation \newline
+    \indicator Loads quickly
+    %
+    & 
+    \commentp ``With good examples in documentation I can easily start prototyping my own project''\newline
+    \commentp ``I can easily find an answer to any of my question concerning the language''\newline
+    \commentn ``It is almost impossible to use and learn language without a well-written documentation'' 
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{3rd-party Resources}\hhigh\newline
+    \textit{Rich community support}
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    & \indicator \textit{N} of textbooks available (for various kind of users; from novices to experienced developers) \newline
+    \indicator Online resources: tutorials, articles, posts  \newline
+    \indicator Q\&A websites \newline
+    \indicator Videos
+    %
+    & \commentp ``It is great when language has a lot of additional resources, tutorials, etc. that explain the same language from different angles, and for different users''
+    \\
+    \noalign{\vspace{5pt}}
+    
+        
+    \cnt& \textbf{Standard Library}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Rich/Clean stdlib}\newline
+    \textit{`Batteries included'}\newline
+    \gray{Go, Python, Java, C++}
+    %
+    & 
+    \indicator \textit{N} of packages available in standard library\newline
+    \indicator Language is following exhaustive vs minimalistic standard library approach\newline
+    %
+    & \commentp ``Rich standard library means I can build a lot without switching to unreliable 3rd-party libraries that might be buggy or become unmaintainable''
+    \\
+    \noalign{\vspace{5pt}}
+
+        
+    \cnt& \textbf{3rd-party Libraries}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Rich ecosystem}\newline
+    \gray{JavaScript, Python, C++}
+    %
+    & \indicator \textit{N} of packages available on GitHub or language's own repository network
+    %
+    & \commentp ``The more packages available in the wild, the faster I can create my own solution, just by using someone else's work''
+    \\
+    \noalign{\vspace{5pt}}
+
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{Language Development and Support}
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    
+    \cnt& \textbf{Development}\hhigh\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Actively Developed}\newline
+    \gray{Python, C++}
+    %
+    & (the overall language development dynamics) \newline
+    \indicator How recently was the stable release \newline
+    \indicator \textit{N} of releases per month/year \newline
+    \indicator \textit{N} of commits per month/year
+    %
+    & \commentp ``If the language is actively developed, then it's not going to \textit{`die'} soon, and so we can rely on it''\newline
+    \commentp ``Bugs reported in the previous version(s) are to be fixed in the next one''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{IDE support}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Supported by many IDEs}\newline
+    \gray{Java}
+    %
+    & \indicator \textit{N} of 3rd-party IDEs supporting the language \newline \gray{IDE support = syntax highlight, syntax checker, code formatter, auto-completion, refactoring, code search, debugging, linter, etc. (each feature gives `point')}
+    %
+    & \commentp ``I can use language in my favorite IDE''\newline
+    \commentn ``Without IDE support (like syntax, error highlighting, autocompletion, and such), the modern use of language is almost impossible''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+
+    \cnt& \textbf{Milestone}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Stable}
+    %
+    & \indicator Language has reached version 1.0 (ie. its library API, syntax, and language constructs became fixed) 
+    %
+    & \commentp ``Language API isn't in complete flux, so we can rely on it without worrying of breaking changes in the next update''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Backward-compatibility}\mmid\newline
+    \textit{Backwards-compatible}\newline
+    \gray{C++, JavaScript}
+    %
+    & \indicator Every new release keeps language API, syntax, and language constructs backward compatible with previous release(s)
+    %
+    & \commentp ``My codebase can rely on the API it was originally written in and yet keep updating compiler for possible performance improvements''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Technical support}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{24/7 Technical support}
+    & \indicator Language provides a service with direct human-based technical support
+    & ---
+    \\
+    \noalign{\vspace{5pt}}
+
+
+
+
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{Language Special Features}
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Garbage collection}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Automatic memory management}\newline
+    \gray{Go, Java, Python, C\texttt{\#}}
+    %
+    & \indicator Language provides a garbage collector (GC)\newline
+    ------\newline
+    \commentp ``Language takes care of my resources so I don't need to think about manual memory allocation and deallocation''
+    %
+    & \commentn ``Programs in the language with automatic memory control are memory hungry and probably cannot be used for embedded systems''\newline
+    \commentn ``Language does not give me manual memory control to do my own (unsafe) stuff''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    \cnt& \textbf{Type safety}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Strong typing}\newline
+    \textit{Static type-checking}\newline
+    \gray{Rust, Go, Haskell}
+    %
+    & \indicator Language provides any form of runtime or/and compile-time type checking (ie. prevents a program to perform illegal operations on values that do not have appropriate data type)
+    %
+    & \commentp ``Programs written in this language are reliable, less error-prone, and always behave the way I defined them to behave''\newline
+    \commentn ``I am so annoyed with constant type checking errors that I simply cannot write programs in it''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    \cnt& \textbf{Memory safety}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Safe/Memory-safe}\newline
+    \gray{Rust, Go, Kotlin}
+    %
+    & \indicator Language provides any form of mechanisms to prevent illegal memory access in a program (runtime/compile-time checks for buffer/stack overflows, dangling pointers, double freeing, etc.)
+    %
+    & \commentp ``Programs written in this language are more safe and less prone to memory leaks''\newline
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Type richness}\hhigh\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Rich types}\newline
+    \gray{Haskell, Scala, Typescript}
+    & \indicator Language has high descriptive power in its type system (eg. support for interfaces, generics, algebraic, high-order, dependent types, etc.)
+    & \commentp ``Language allows me to define complex types, data and program behaviour as well as verify them prior execution''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Exception handling}\hhigh\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Exception handling}\newline
+    \gray{C++, Python, Java}
+    & \indicator Language provides mechanisms for handing unexpected runtime errors without immediate crash / resuming execution
+    & \commentp ``Language allows me to handle runtime errors such that I am able to recover execution flow or exit properly''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    \cnt& \textbf{Concurrency}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Parallel computing}\newline
+    \textit{Multithreaded}\newline
+    \textit{Coroutines}\newline
+    \gray{C/C++, Go, Erlang}
+    & \indicator Language supports any form of parallel execution and multithreaded computing: 
+    \newline\indicator Heavyweight threads (also native, OS threads)
+    \newline\indicator Lightweight coroutines (also fibers, generators, `green threads')
+    & \commentp ``Language allows me to do parallel computing (ie. utilize as much computing power as possible) in a manageable way''
+    \\
+    \noalign{\vspace{5pt}} % 
+
+    \cnt& \textbf{Instruction-level parallelism}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Parallel computing}\newline
+    \textit{SIMD programming}\newline
+    \gray{C/C++}
+    & \indicator Language supports any form of vectorized operations or `SIMD programming' (eg. explicit directives for vectorized/`streaming' data structures, operations, loop unrolling, etc.)
+    & \commentp ``Language allows me to do professional optimization of my code to get the maximum performance and efficiency of my programs''
+    \\
+    \noalign{\vspace{5pt}}
+
+    \cnt& \textbf{GPU computing}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Parallel computing}\newline
+    \textit{Scientific computing}\newline
+    \gray{C/C++}
+    & \indicator Language provides well-supported libraries or primitives to dispatch execution onto GPU(s)
+    & \commentp ``Language allows me to accelerate my programs with the power of GPU''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Distributed computing}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Distributed computing}\newline
+    \gray{C/C++, Julia, Erlang}
+    & \indicator Language provides mechanisms to distribute a single program or execution flow upon several physically separated machines (incl. separated by network)
+    & \commentp ``Language allows me to do highly scalable computation across multiple machines''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Message passing}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Distributed computing}\newline
+    \gray{Erlang, Smalltalk, Java}
+    & \indicator Language supports sending messages between abstract objects which can be objects, parallel processes, subroutines, functions or threads
+    & \commentp ``Language gives me a single model of objects that simply communicate with each other, no matter whether they are functions or parallel processes''
+    \\
+    \noalign{\vspace{5pt}}
+
+    \cnt& \textbf{Reflection}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Reflective}\newline
+    \gray{Go, Julia, JavaScript}
+    & \indicator Language provides constructs to `see' and modify its own code (normally, at runtime; eg. accessing variable names, function signatures, etc.)
+    & 
+    % \commentp ``I can do static analysis of my code without messing around reading sources directly''\newline
+    \commentp ``I can access meta-data of classes, interfaces, fields or methods at runtime without knowing their names at compile time, which allows me to write much more generic code and do all kinds of static/dynamic code analysis''
+    \\
+    \noalign{\vspace{5pt}}
+
+    \cnt& \textbf{Lazy evaluation}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \gray{Haskell, Io, Clojure,\\ Scala}
+    & \indicator Language supports holding up the evaluation of an expression until its value is needed\newline
+    \indicator Language allows switching back to or explicitly forcing (normal) `eager evaluation' when needed\newline
+    ------\newline
+    \commentp ``In lazy language it is possible to define infinite lists and elegantly handle streams of data''
+    
+    & 
+    \commentp ``My code can be more efficient in terms of memory and performance because values don't need to be computed if they  aren't going to be used''\newline
+    \commentn ``Lazy evaluation brings a certain amount of memory bloat, and requires too much knowledge of the program and algorithms to get the benefits''\newline
+    \commentn ``It is not clear when exactly side effects are going to happen and so it is hard to debug''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Lambda expressions}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \gray{Haskell, Scheme, many...}
+    & \indicator Language supports anonymous functions
+    & \commentp ``I can construct higher-order functions or use them as values to return from other functions''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Package manager}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Package manager}\newline
+    \gray{C\texttt{\#} NuGet, Python pip}
+    %
+    & \indicator Language allows to download and install packages and dependencies using one of its (built-in) CLI commands
+    %
+    & \commentp ``Language comes with its own package manager so I don't need to install some 3-rd party packages to get things up and running''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Doc generator}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Doc comments}\newline
+    \gray{Java, C\texttt{\#}}
+    %
+    & \indicator Language supports `documentation comments' (formatting tags) and is able to generate (HTML) pages based on these annotations
+    %
+    & \commentp ``I can embed parts of program documentation directly into my source code and get nice-looking pages for free''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Build system}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Native build system}\newline
+    \gray{Zig}
+    %
+    & \indicator Language allows to write build scripts in itself without using external tools or other languages (such as Bash, make, CMake, Maven, etc.) 
+    %
+    & \commentp ``It is great that I don't need to learn other building tools and their cryptic languages in order to automate my project building routines''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Error hints}\hhigh\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Smart compiler}\newline 
+    \textit{Helpful debug messages}\newline 
+    \gray{Elm}
+    %
+    & \indicator Language compiler or run-time environment provides error messages that are instructive enough to understand and to fix them 
+    & \commentp ``Language is really good in helping to fix my code. I get not only an error message but also a hint how to fix it''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Code formatting}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{No more formatting wars}\newline
+    \gray{Go fmt, C clang-format}
+    %
+    & \indicator Language compiler can automatically reformat code to follow default/user-defined coding standards
+    & \commentp ``I don't need to spend time following numerous and over-complicated coding styles to format my code. Let the language to do it instead''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Macros}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Metaprogramming}\newline
+    \gray{C/C++, Zig, Nim}
+    %
+    & \indicator Language supports any form of metaprogramming or defining `macros' to execute logic during compile time
+    & \commentp ``I can do a lot of prepossessing during compile time so that runtime is not occupied by unnecessary computations''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Native IDE}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Built-in IDE}\newline
+    \gray{Eiffel $\rightarrow$ EiffelStudio}
+    %
+    & \indicator Language offers its own integrated development environment \newline
+    ------ \newline
+    \commentp ``Native IDE may give much better integration than 3rd-party alternatives''
+    %
+    & \commentn ``I don't want to change my environment just because of the language'' (if only native IDE available) \newline
+    \commentn ``It's unlikely that build-in IDE is better than my current''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{REPL}\hhigh\newline
+    \textit{Interactive}\newline
+    \gray{Python, Scala}
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    & \indicator Language has interactive Read–Eval–Print-Loop mode
+    & \commentp ``It is easy to play with the language and test code snippets''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Embedding}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Embeddable}\newline
+    \gray{Lua, Tcl, Red, Lisp}
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    & \indicator Language (as `guest') can run in \textit{N} of (`host') languages or applications 
+    & \commentp ``Language can be used as a \textit{scripting} language to automate repetitive tasks in my favorite application or other host language (eg. Bash in shell, Python in Blender, Lua in World of Warcraft)''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    \cnt& \textbf{Bindings}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{FFI support}\textsuperscript{*}\newline
+    \gray{Python/Go $\leftarrow$ C/C++}\newline
+    \gray{Kotlin $\leftrightarrow$ Java}
+    %
+    & \indicator Language supports direct function calls (bindings) of a specific or \textit{N} other languages without wrappers or special API\newline
+    \gray{\textsuperscript{*}FFI (Foreign Function Interface) -- a language is capable to call functions written in another language providing so called `bindings' (primarily to C)}
+    %
+    & \commentp ``My code can easily use the libraries of other language(s)''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    \cnt& \textbf{Transpilation}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Transpiled}\newline
+    \gray{Haxe, TypeScript, Elm}
+    %
+    & \indicator Language is able to compile code into source code of other \textit{N} (high-level) languages
+    %
+    & \commentp ``I can keep writing my code in the language to the benefits of which I already get used to but also benefit from other language(s) infrastructure, libraries, performance, etc.''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    \cnt& \textbf{IR access}\hhigh\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Open interface}\newline 
+    \textit{Deep language integration}\newline
+    \gray{C\texttt{\#} or VB (using Roslyn)}
+    %
+    & \indicator Language, for each compilation step, provides internal intermediate representation (IR) export (eg. pre-processed source code, parse tree, syntax tree, intermediate code, etc.)
+    %
+    & \commentp ``Probably language provides a good amount of data for implementing advanced IDE features (debuggers, static analyzers, code formatters, dependency checkers, visualizers, etc.)''
+    \\
+    \noalign{\vspace{5pt}}
+    
+ 
+    \cnt& \textbf{Unicode support}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{UTF-8 support}\newline
+    \gray{Java, C\texttt{\#}, Go, Swift}
+    %
+    & \indicator Language supports Unicode Standard for representing characters in strings or identifiers
+    %
+    & \commentp ``I can work with special characters such as emoji in my strings or use foreign language identifiers''
+    \\
+    \noalign{\vspace{5pt}}
+    
+ 
+    \cnt& \textbf{GOTO support}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \gray{C/C++, Go, Fortran}
+    %
+    & \indicator Language supports `\texttt{goto}' statements for unconditional jumps to specific program locations (usually by means of labels)
+    %
+    & \commentp ``I can create custom control structures where the built-in ones does not satisfy my (professional/low-level) needs''\newline
+    \commentn ``GOTO statements can be easily abused by unskillful programmer and lead to notorious Spaghetti code''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{Language Implementation and Programs}
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Compilation speed}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Fast compilation}\newline
+    \gray{C, Go, Zig}
+    %
+    & \indicator How fast compiler compiles programs in s/ms/ns
+    %
+    & \commentp ``Recompilation time in this language is really short, which allows me to make the feedback loop between code changes and results short''
+    \\
+    \noalign{\vspace{5pt}}
+
+     
+    \cnt& \textbf{Runtime speed}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Fast}\newline
+    \gray{C/C++, Rust, Zig}
+    %
+    & \indicator How fast programs run in s/ms/ns
+    %
+    & \commentp ``Language is blazingly fast, programs written it run really quickly''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Compile-time memory footprint}\llow\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Low memory usage}\newline
+    \gray{C, Pascal, Forth}
+    %
+    & \indicator The amount of memory in bytes needed to compile a program (or \textit{while} compiling the program)
+    %
+    & \commentp ``I can compile big projects without thinking that I will run out of memory on my machine''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    \cnt& \textbf{Runtime memory footprint}\llow\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Low memory footprint}\newline
+    \gray{C/C++, Fortran, Rust}
+    %
+    & \indicator The amount of memory in bytes that a program uses \textit{while} running
+    %
+    & \commentp ``Programs written in this language hardly use any RAM (compared to others), which means the compiler performs good optimizations, emits efficient code and probably suitable for embedded systems''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Compiler/VM size}\llow\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Lightweight}\newline
+    \gray{Lua}
+    %
+    & \indicator Size of language compiler or VM in LOC/bytes 
+    %
+    & \commentp ``Language is lightweight, minimalistic and (possibly) embeddable''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    \cnt& \textbf{Executable size}\llow\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Compact programs}\newline
+    \textit{Slim binaries}\newline
+    \gray{C, Oberon, Zig}
+    %
+    & \indicator Size of executables, including the ones for VM, in bytes (eg. with default compiler options) 
+    %
+    & \commentp ``Programs are small, possibly fast, and may fit into embedded systems''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Compiler/VM portability}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Portable}\newline
+    \gray{C/C++, Java}
+    & \indicator  \textit{N} of platforms the language compiler/VM can run on
+    & \commentp ``I can compile my code on many platforms'' or ``I can run compiler/VM on many platforms''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Executable portability}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Cross-compiled}\newline
+    \textit{Portable, Transpiled}\newline
+    % \textit{}\newline
+    \gray{C/C++, Java}
+    %
+    & \indicator \textit{N} of `target platforms' the language programs can be run on
+    %
+    & \commentp``I can write code once and run it anywhere (WORA)''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{CLI complexity}\llow\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Simple to use}\newline
+    \gray{Go}
+    %
+    & \indicator \textit{N} of \texttt{\$ language command}s \newline 
+    \indicator \textit{N} of command line \texttt{-\--options}
+    %
+    & \commentp ``Command Line Interface of the language is easy and simple to use and remember''\newline
+    % \commentp ``CLI meets all of my requirements and needs''
+    %
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Self-hosting}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Self-hosted}\newline
+    \gray{Zig, Go, Rust}
+    %
+    & \indicator Language implementation is written in itself \newline
+    ------\newline
+    \commentp ``If language is self-hosted, it can be considered `serious', `production ready' and independent from others''
+    %
+    & \commentp ``Language can get more contributions to its compiler by people who before would only work on the standard library''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Open-source}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Open Source}\newline
+    \textit{OSI-approved}\newline
+    \gray{Python, Go}
+    %
+    & \indicator  Language (compiler) source code is open-source and available for download, modification, recompilation, distribution, static linking and commercialization
+    %
+    & \commentp ``Open-source is good because anyone can contribute to language development: do code reviews, fix bugs, write modules, documentation, etc.''\newline
+    \commentn ``If open-source, it is not clear who is responsible for the project and fixing bugs. It can be abandoned at any time''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    
+    \cnt& \textbf{License}\mmid\newline
+    \textit{MIT license}
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    & \indicator Language license type (MIT, GPL, BSD etc.) 
+    %
+    & \commentp ``Nonrestrictive license types give a language freedom to be not confined to any single ownership, and prevent attempts to be company or technology-specific''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{Language Specialization and Design}
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    \cnt& \textbf{Paradigm}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    & \indicator Language presents itself as following a particular or multiple paradigms (eg. procedural, object-oriented, functional)
+    %
+    & \commentp ``I like when the language mix different paradigms because I can approach problems using a paradigm that is the most effective for the solution'' 
+    \\
+    \noalign{\vspace{5pt}}
+
+    \cnt& \textbf{Visual language}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Visual Programming}\newline
+    \gray{DRAKON, Scratch}
+    %
+    & \indicator Language has a graphical representation and can be used as a visual modeling or programming language
+    %
+    & \commentp ``I like the visual expression of my code to better understand and manipulate my program''
+    \\
+    \noalign{\vspace{5pt}}
+   
+
+    \cnt& \textbf{Esoteric language}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \gray{Brainfuck}
+    %
+    & \indicator Language is considered as `esoteric' (esolang)
+    %
+    & \commentp ``I can use the language as a form of software art to show off my skills''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Educational language}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \gray{Logo}
+    %
+    & \indicator Language is specifically designed or can be used to introduce pure computer science ideas (also known as `tiny', `small', or `first') 
+    %
+    & \commentp ``I can use the language to concentrate on pure ideas without being distracted with unnecessary infrastructural details''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Domain-specialization}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Used by professionals}\newline
+    \textit{Hardened by industry}\newline
+    \gray{R in statistics}\newline
+    \gray{Matlab/Python in scientific computations}
+    %
+    & \indicator Language became one of the standard tool used in a certain domain \newline 
+    ------ \newline
+    \commentn ``Language is not safe to invest time because if I use it, I'll stuck in its domain''
+    %
+    & \commentp ``Language is safe for time investment because other people in my domain already use it'' \newline
+    \commentp ``Typical problems have been solved already'' \newline
+    \commentp ``It will be easier to find a job (or simply, you don't find any without having skills in it)'' \newline
+    \commentp ``I'll be able to do what other professionals do''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Platform-orientation}\mmid\newline
+    \textit{Deep integration}\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \gray{Apple $\rightarrow$ Swift\newline Microsoft $\rightarrow$ C\texttt{\#}}
+    %
+    & \indicator Language is primarily driven by or developed for a certain platform and its infrastructure
+    %
+    & \commentp ``Language provides the best integration experience for this platform'' \newline
+    \commentn ``If I use this language I will probably \textit{stuck} in its infrastructure''
+    \\
+    \noalign{\vspace{5pt}}
+    
+
+    \cnt& \textbf{Expressiveness}\hhigh\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Expressive, Powerful}
+    \gray{Python}
+    & \indicator  Length of program in LOC to express a typical problem comparing to the same task written in another language \cite{mike_mol_rosetta}
+    & \commentp ``Language is easy to write, it is concise, short and elegant; code do not repeat itself'' (if $\uparrow$, otherwise) \newline
+    \commentn ``Language is difficult to write, read, and maintain; code grows fast''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Syntactic complexity}\llow\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Laconic, Concise}\newline
+    \textit{Elegant, Simple}\newline
+    \gray{Lisp $\downarrow$, C++ $\uparrow$}
+    %
+    & \indicator \textit{N} of production rules language grammar has \newline
+    \indicator \textit{N} of keywords \newline
+    %
+    & \commentp ``Language is simple, elegant, concise and has a small learning curve'' (if $\downarrow$, otherwise) \newline 
+    \commentn ``Language is bulky, complex, bloated and has a steep learning curve''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Syntactic coherence}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Clean syntax}\newline
+    \gray{APL, Brainfuck $\downarrow$}\newline
+    \gray{Elm $\uparrow$}
+    %
+    & \indicator Ratio between word- vs ASCII-based operators, keywords, and constructs \newline
+    \indicator Keywords are in/distinguishable \newline
+    \indicator Use of ASCII in identifiers is not/allowed \newline
+    \indicator Lack/use of underscores in reserved identifiers
+    %
+    &
+    \commentn ``Code is cryptic, noisy, ripples in eyes and difficult to follow'' (if $\uparrow$, otherwise) \newline 
+    \commentp ``Code is clean, consistent and easy to follow''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Semantic complexity}\llow\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Simple}\newline
+    \gray{Go}
+    %
+    & \indicator \textit{N} of language constructs \newline
+    \indicator \textit{N} of built-in operators \newline
+    %
+    & \commentp ``The less construct language has, the less I need to remember''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Semantic coherence}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Consistent design}\newline
+    \textit{Easy to learn}\newline
+    \textit{Coherent}\newline
+    \gray{Lisp}
+    %
+    & \indicator Language constructs are composable with each other \newline 
+    \indicator Language follows a paradigm `everything is an expression' 
+    %
+    & \commentp ``Language feels well-designed, coherent, and easy to learn. It has a small amount of constructs, everything is composable with each other, and there are little/no special rules or exceptions''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    \cnt& \gray{\footnotesize (Syntactic/Semantic)}\newline
+    \textbf{Homoiconicity}\mmid\newline 
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Code as data}\newline
+    \gray{Lisp, Scheme}
+    %
+    & \indicator Code can be directly interpreted as data (ie. as language built-in structures), and inversely, data can be executed as code
+    %
+    & \commentp ``Language feels magical and self-referential''\newline
+    \commentp ``I can easily generate programs or do program analysis written in that language''
+    \\
+    \noalign{\vspace{5pt}}
+
+    
+    \cnt& \textbf{Design independence}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Inspired by X}\newline
+    \textit{Designed from scratch}\newline
+    \gray{where X is a well-known language}%
+    %
+    & \indicator Language design is `inspired' by other languages, or it is a continuation of `language family'
+    %
+    & \commentp ``If the language is inspired by \textit{X}, and \textit{X} wasn't bad, then the new one is going to be at least as good as its predecessor(s)''\newline
+    \commentp ``If a language designed from scratch, it is probably fresh and ambitious enough to give a good `punch' to others''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+
+
+
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{Language Definition}
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Specification}\hhigh\newline
+    \gray{C/C++, Java}
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    & \indicator Language has a normative Specification with a complete in-/semi-/formal definition of its form (syntax) and behaviour (semantics)\newline
+    \indicator Specification includes the specification of standard library
+    %
+    & \commentn ``If specification is too big, the language is probably over-complicated to hold in one's programmer head and so, difficult to learn'' \newline
+    \commentp ``If specification is simple/short, the language can be probably easily re-implemented or ported to new architectures''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    \cnt& \textbf{Standardization}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Standardized}\newline
+    \gray{C/C++}
+    %
+    & \indicator Specification is based on the consensus of different parties that may include firms, interest groups, standards organizations or governments \newline
+    % \indicator Language reached the point where it is necessary to have a standard in order to keep different implementations inter-operable/compatible
+    %
+    & 
+    \commentp ``It is good that I can have independent compilers for the same code base and switch them if there is performance or development stagnating issues''
+    \commentn ``It became huge, bulky and slow-moving because its design is now dispatched to a standardization committee rather than individual(s)''\newline
+    \\
+    \noalign{\vspace{5pt}}
+    
+
+    \cnt& \textbf{Formal syntax}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \gray{SQL, C\texttt{\#}, Go, Python}
+    %
+    & \indicator Specification includes the formal grammar of language syntax (normally in EBNF)
+    %
+    & \commentp ``I can use it to write a parser for language analysis or as a basis for its reference implementation''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    
+    \cnt& \textbf{Formal semantics}\hhigh\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Formalized}\newline
+    \gray{Standard ML, PL/I}
+    %
+    & \indicator Specification includes the definition of language semantics in some theory or formal system (eg. Set theory+First-order logic, Category theory, etc.)
+    %
+    & \commentp ``Behaviour of my programs can be verified with mathematical rigour''\newline
+    \commentp ``Language can be used for mission- and safety-critical software systems'',
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    % Metric Category
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    & \metriccategory{Language Origin}
+    \\
+    \noalign{\vspace{5pt}}
+
+ 
+    \cnt& \textbf{Origin}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Came from X}\newline
+    \gray{X is a well-known company or eminent university}
+    & \indicator Language was born as an academic, industry, or a hobby project\newline
+    ------\newline
+    \commentp ``If the language was born in industry, it is probably battle-tested, pragmatic, and understandable by a normal human being''
+    & \commentn ''If the language was born in academia, probably it is \textit{not} well suited for the real industrial software development''\newline
+    \commentp ``If it was born in academia, it is well-designed, has a mathematical rigour, formally defined behaviour, and potentially verifiable programs''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Author}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Designed by X}\newline
+    \gray{X is a prominent person}
+    & \indicator Author name(s) who designed, implemented or gave rebirth to the language 
+    & \commentp ``If the author is well-known developer/researcher, then the language should be well-designed too''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+    \cnt& \textbf{Initial purpose}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Designed for X}\newline
+    % \gray{hence focused, well-suited}
+    & \indicator The problem domain the language was originally (historically) designed for 
+    & \commentp ``If the language was created for X, then it should probably do it well''
+    \\
+    \noalign{\vspace{5pt}}
+    
+    \cnt& \textbf{Age}\mmid\newline
+    % %%%%%%%%%%%%%%%%%%%%%%%%
+    \textit{Developed since X}\newline
+    \gray{X suggests maturity}
+    & \indicator Date or \textit{N} of years from the first release or exposition 
+    & \commentp ``If the language is developed over many years, then it must be mature, has comprehensive documentation, and vast infrastructure''\newline
+    \commentn ``If the language is too old, then it is slow developed, its design overloaded with special cases and exceptions, and it is overall conservative towards new advancements''
+    \\
+    \noalign{\vspace{5pt}}
+
+
+
+\end{longtable}
+
+
+\newgeometry{top=2cm, textwidth=17cm}
+\twocolumn
+
+% Contributors
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{Acknowledgement}
+\begin{enumerate}[leftmargin=*]
+    \setlength\itemsep{-3pt}
+    \item Eugene Zouev, \textit{Innopolis University}, \texttt{\small e.zuev@innopolis.ru}
+    % \item Nikolay Shilov, \textit{Innopolis University}, \texttt{\small shiloviis@mail.ru}
+\end{enumerate}
+
+% References
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \subsection*{References}
+\printbibliography[title={\large References}]
+% hack to remove References title
+% \renewcommand\refname{}
+% \vspace{-2.5em}
+% \bibliographystyle{ieeetr}
+% \bibliography{appedixrefs}
+
+
+\end{document}
